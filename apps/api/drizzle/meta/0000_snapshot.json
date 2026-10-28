@@ -1,0 +1,859 @@
+{
+  "id": "b6beab7a-67e9-4757-9842-252705bb36d4",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.account_monthly_usage": {
+      "name": "account_monthly_usage",
+      "schema": "",
+      "columns": {
+        "account_id": {
+          "name": "account_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "month": {
+          "name": "month",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "used_units": {
+          "name": "used_units",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "account_monthly_usage_account_id_accounts_id_fk": {
+          "name": "account_monthly_usage_account_id_accounts_id_fk",
+          "tableFrom": "account_monthly_usage",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "account_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "account_monthly_usage_pk": {
+          "name": "account_monthly_usage_pk",
+          "columns": [
+            "account_id",
+            "month"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "account_monthly_usage_non_negative": {
+          "name": "account_monthly_usage_non_negative",
+          "value": "\"account_monthly_usage\".\"used_units\" >= 0"
+        },
+        "account_monthly_usage_first_of_month": {
+          "name": "account_monthly_usage_first_of_month",
+          "value": "EXTRACT(DAY FROM \"account_monthly_usage\".\"month\") = 1"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.accounts": {
+      "name": "accounts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "api_key_hash": {
+          "name": "api_key_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "api_key_prefix": {
+          "name": "api_key_prefix",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "plan_id": {
+          "name": "plan_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "plan_scope": {
+          "name": "plan_scope",
+          "type": "plan_scope",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'account'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "accounts_plan_id_idx": {
+          "name": "accounts_plan_id_idx",
+          "columns": [
+            {
+              "expression": "plan_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "accounts_plan_fk": {
+          "name": "accounts_plan_fk",
+          "tableFrom": "accounts",
+          "tableTo": "plans",
+          "columnsFrom": [
+            "plan_id",
+            "plan_scope"
+          ],
+          "columnsTo": [
+            "id",
+            "scope"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "accounts_api_key_hash_unique": {
+          "name": "accounts_api_key_hash_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "api_key_hash"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "accounts_plan_scope_is_account": {
+          "name": "accounts_plan_scope_is_account",
+          "value": "\"accounts\".\"plan_scope\" = 'account'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.plans": {
+      "name": "plans",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scope": {
+          "name": "scope",
+          "type": "plan_scope",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "monthly_limit": {
+          "name": "monthly_limit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "per_request_limit": {
+          "name": "per_request_limit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "plans_account_id_accounts_id_fk": {
+          "name": "plans_account_id_accounts_id_fk",
+          "tableFrom": "plans",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "account_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "plans_code_unique": {
+          "name": "plans_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "code"
+          ]
+        },
+        "plans_id_scope_unique": {
+          "name": "plans_id_scope_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id",
+            "scope"
+          ]
+        },
+        "plans_account_scope_name_unique": {
+          "name": "plans_account_scope_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "account_id",
+            "scope",
+            "name"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "plans_monthly_limit_positive": {
+          "name": "plans_monthly_limit_positive",
+          "value": "\"plans\".\"monthly_limit\" > 0"
+        },
+        "plans_per_request_limit_positive": {
+          "name": "plans_per_request_limit_positive",
+          "value": "\"plans\".\"per_request_limit\" > 0"
+        },
+        "plans_version_positive": {
+          "name": "plans_version_positive",
+          "value": "\"plans\".\"version\" > 0"
+        },
+        "plans_predefined_xor_owned": {
+          "name": "plans_predefined_xor_owned",
+          "value": "(\"plans\".\"account_id\" IS NULL) = (\"plans\".\"code\" IS NOT NULL)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.usage_requests": {
+      "name": "usage_requests",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "request_id": {
+          "name": "request_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "units": {
+          "name": "units",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "decision_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rejection_reason": {
+          "name": "rejection_reason",
+          "type": "rejection_reason",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rejection_level": {
+          "name": "rejection_level",
+          "type": "limit_level",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "usage_month": {
+          "name": "usage_month",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "processed_at": {
+          "name": "processed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_plan_id": {
+          "name": "account_plan_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_plan_version": {
+          "name": "account_plan_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_monthly_limit": {
+          "name": "account_monthly_limit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_per_request_limit": {
+          "name": "account_per_request_limit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_used_before": {
+          "name": "account_used_before",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_used_after": {
+          "name": "account_used_after",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_plan_id": {
+          "name": "user_plan_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_plan_version": {
+          "name": "user_plan_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_monthly_limit": {
+          "name": "user_monthly_limit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_per_request_limit": {
+          "name": "user_per_request_limit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_used_before": {
+          "name": "user_used_before",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_used_after": {
+          "name": "user_used_after",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "usage_requests_account_history_idx": {
+          "name": "usage_requests_account_history_idx",
+          "columns": [
+            {
+              "expression": "account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "processed_at",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            },
+            {
+              "expression": "id",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "usage_requests_user_history_idx": {
+          "name": "usage_requests_user_history_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "processed_at",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            },
+            {
+              "expression": "id",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "usage_requests_account_plan_id_plans_id_fk": {
+          "name": "usage_requests_account_plan_id_plans_id_fk",
+          "tableFrom": "usage_requests",
+          "tableTo": "plans",
+          "columnsFrom": [
+            "account_plan_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "usage_requests_user_plan_id_plans_id_fk": {
+          "name": "usage_requests_user_plan_id_plans_id_fk",
+          "tableFrom": "usage_requests",
+          "tableTo": "plans",
+          "columnsFrom": [
+            "user_plan_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "usage_requests_user_fk": {
+          "name": "usage_requests_user_fk",
+          "tableFrom": "usage_requests",
+          "tableTo": "users",
+          "columnsFrom": [
+            "account_id",
+            "user_id"
+          ],
+          "columnsTo": [
+            "account_id",
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "usage_requests_account_request_unique": {
+          "name": "usage_requests_account_request_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "account_id",
+            "request_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "usage_requests_units_positive": {
+          "name": "usage_requests_units_positive",
+          "value": "\"usage_requests\".\"units\" > 0"
+        },
+        "usage_requests_first_of_month": {
+          "name": "usage_requests_first_of_month",
+          "value": "EXTRACT(DAY FROM \"usage_requests\".\"usage_month\") = 1"
+        },
+        "usage_requests_rejection_consistent": {
+          "name": "usage_requests_rejection_consistent",
+          "value": "(\"usage_requests\".\"status\" = 'accepted' AND \"usage_requests\".\"rejection_reason\" IS NULL AND \"usage_requests\".\"rejection_level\" IS NULL)\n        OR (\"usage_requests\".\"status\" = 'rejected' AND \"usage_requests\".\"rejection_reason\" IS NOT NULL AND \"usage_requests\".\"rejection_level\" IS NOT NULL)"
+        },
+        "usage_requests_usage_delta_consistent": {
+          "name": "usage_requests_usage_delta_consistent",
+          "value": "\"usage_requests\".\"account_used_after\" = \"usage_requests\".\"account_used_before\" + CASE WHEN \"usage_requests\".\"status\" = 'accepted' THEN \"usage_requests\".\"units\" ELSE 0 END\n        AND \"usage_requests\".\"user_used_after\" = \"usage_requests\".\"user_used_before\" + CASE WHEN \"usage_requests\".\"status\" = 'accepted' THEN \"usage_requests\".\"units\" ELSE 0 END"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.user_monthly_usage": {
+      "name": "user_monthly_usage",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "month": {
+          "name": "month",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "used_units": {
+          "name": "used_units",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_monthly_usage_user_fk": {
+          "name": "user_monthly_usage_user_fk",
+          "tableFrom": "user_monthly_usage",
+          "tableTo": "users",
+          "columnsFrom": [
+            "account_id",
+            "user_id"
+          ],
+          "columnsTo": [
+            "account_id",
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "user_monthly_usage_pk": {
+          "name": "user_monthly_usage_pk",
+          "columns": [
+            "user_id",
+            "month"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "user_monthly_usage_non_negative": {
+          "name": "user_monthly_usage_non_negative",
+          "value": "\"user_monthly_usage\".\"used_units\" >= 0"
+        },
+        "user_monthly_usage_first_of_month": {
+          "name": "user_monthly_usage_first_of_month",
+          "value": "EXTRACT(DAY FROM \"user_monthly_usage\".\"month\") = 1"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "plan_id": {
+          "name": "plan_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "plan_scope": {
+          "name": "plan_scope",
+          "type": "plan_scope",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'user'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "users_account_created_idx": {
+          "name": "users_account_created_idx",
+          "columns": [
+            {
+              "expression": "account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "users_plan_id_idx": {
+          "name": "users_plan_id_idx",
+          "columns": [
+            {
+              "expression": "plan_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "users_account_id_accounts_id_fk": {
+          "name": "users_account_id_accounts_id_fk",
+          "tableFrom": "users",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "account_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "users_plan_fk": {
+          "name": "users_plan_fk",
+          "tableFrom": "users",
+          "tableTo": "plans",
+          "columnsFrom": [
+            "plan_id",
+            "plan_scope"
+          ],
+          "columnsTo": [
+            "id",
+            "scope"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_account_id_id_unique": {
+          "name": "users_account_id_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "account_id",
+            "id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "users_plan_scope_is_user": {
+          "name": "users_plan_scope_is_user",
+          "value": "\"users\".\"plan_scope\" = 'user'"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.decision_status": {
+      "name": "decision_status",
+      "schema": "public",
+      "values": [
+        "accepted",
+        "rejected"
+      ]
+    },
+    "public.limit_level": {
+      "name": "limit_level",
+      "schema": "public",
+      "values": [
+        "account",
+        "user"
+      ]
+    },
+    "public.plan_scope": {
+      "name": "plan_scope",
+      "schema": "public",
+      "values": [
+        "account",
+        "user"
+      ]
+    },
+    "public.rejection_reason": {
+      "name": "rejection_reason",
+      "schema": "public",
+      "values": [
+        "ACCOUNT_PER_REQUEST_LIMIT_EXCEEDED",
+        "USER_PER_REQUEST_LIMIT_EXCEEDED",
+        "ACCOUNT_MONTHLY_LIMIT_EXCEEDED",
+        "USER_MONTHLY_LIMIT_EXCEEDED"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "scenario": "scenario-a-normal",
+  "generatedAt": "2026-10-28T22:24:08.853Z",
+  "durationSeconds": 57.1,
+  "totalHttpRequests": 45294,
+  "consumeRequests": 44975,
+  "accepted": 29004,
+  "rejected": 15971,
+  "replayed": 0,
+  "consumeThroughputPerSecond": 787.4,
+  "consumeLatencyMs": {
+    "median": 37.66,
+    "p90": 74.86,
+    "p95": 91.59,
+    "max": 487.43
+  },
+  "httpErrorRate": 0,
+  "checksPassRate": 1,
+  "thresholds": {
+    "http_req_failed": {
+      "rate<0.01": true
+    },
+    "consume_latency": {
+      "p(95)<500": true
+    },
+    "checks": {
+      "rate>0.99": true
+    }
+  }
+}

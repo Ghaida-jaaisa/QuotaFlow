@@ -1,0 +1,22 @@
+{
+  "name": "quotaflow",
+  "private": true,
+  "description": "Usage metering and quota service with PostgreSQL-backed atomic accounting",
+  "workspaces": [
+    "apps/api",
+    "apps/web"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "typecheck": "npm run typecheck --workspaces",
+    "test": "npm run test -w @quotaflow/api",
+    "dev:api": "npm run dev -w @quotaflow/api",
+    "dev:web": "npm run dev -w @quotaflow/web",
+    "db:migrate": "npm run db:migrate -w @quotaflow/api",
+    "db:generate": "npm run db:generate -w @quotaflow/api",
+    "demo": "npm run demo -w @quotaflow/web"
+  }
+}

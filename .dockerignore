@@ -1,0 +1,7 @@
+**/node_modules
+**/dist
+.env
+.git
+load-tests
+**/*.log
+**/.DS_Store

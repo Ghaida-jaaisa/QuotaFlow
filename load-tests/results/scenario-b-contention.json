@@ -1,0 +1,30 @@
+{
+  "scenario": "scenario-b-contention",
+  "generatedAt": "2026-10-28T22:22:45.115Z",
+  "durationSeconds": 30.1,
+  "totalHttpRequests": 32933,
+  "consumeRequests": 32914,
+  "accepted": 251,
+  "rejected": 22884,
+  "replayed": 9779,
+  "consumeThroughputPerSecond": 1092.6,
+  "consumeLatencyMs": {
+    "median": 81.96,
+    "p90": 130.07,
+    "p95": 151.49,
+    "max": 374.47
+  },
+  "httpErrorRate": 0,
+  "checksPassRate": 1,
+  "thresholds": {
+    "http_req_failed": {
+      "rate<0.01": true
+    },
+    "checks": {
+      "rate>0.99": true
+    },
+    "idempotency_conflicts": {
+      "count==0": true
+    }
+  }
+}
